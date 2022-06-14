@@ -3,20 +3,35 @@ import React, { Component } from 'react'
 class Text extends  Component {
 
     state={
-        myinput:false,
+        show:false,
         myval:"This is an editable text."
     }
+    
+    ref=React.createRef()
 
-    convertToText=()=>{
+    toggle=()=>{
         this.setState(
-           state=>( {myinput:! state.myinput}))
-        console.log(this.state.myinput)
+           state=>( {show:! state.show}),()=>{
+            this.ref.current?.focus()
+        }
+        )
      }
 
-     convertToDiv=(e)=>{
+    handleClickOutside=(event) =>{
+        if (this.ref.current && !this.ref.current.contains(event.target)) {
+         this.setState(
+             state=>({show:!state.show}))
+        }
+      }
+
+      componentDidMount() {
+        document.addEventListener("mousedown", this.handleClickOutside);
+      }
+
+     handleInput=(e)=>{
         this.setState(
            ( {myval: e.target.value}))
-        console.log(this.state.myinput)
+        console.log(this.state.show)
      }
 
     render() {
@@ -26,9 +41,9 @@ class Text extends  Component {
             <>
                
               
-               <button onClick={this.convertToText}></button>
+               <button onClick={this.toggle}>{this.state.show ? "hide" :"show"}</button>
 
-               {this.state.myinput ? <input value={this.state.myval} onChange={this.convertToDiv}/> : <div >{this.state.myval}</div> } 
+               {this.state.show ? <input value={this.state.myval} onChange={this.handleInput} ref={this.ref}/> : <div >{this.state.myval}</div> } 
             </>
         )
     }
